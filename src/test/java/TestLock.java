@@ -16,6 +16,13 @@ public class TestLock {
 
     @Test
     public void test1() {
+
+    }
+
+    //----------------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void test3() {
         ExecutorService executor = Executors.newFixedThreadPool(2);
         SharedQueue sharedQueue = new SharedQueue(1000);
 
