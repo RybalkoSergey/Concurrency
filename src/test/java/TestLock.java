@@ -110,6 +110,26 @@ public class TestLock {
         ConcurrentUtils.stop(service);
     }
 
+    @Test
+    public void test6() throws InterruptedException {
+        final Task task = new LockInterruptiblyDemo();
+        Thread thread1 = new Thread(new Worker(task));
+        thread1.start();
+
+        Thread thread2 = new Thread(new Worker(task));
+        thread2.start();
+
+        Thread thread3 = new Thread(new Worker(task));
+        thread3.start();
+
+        sleep(1);
+
+        thread2.interrupt();
+        thread3.interrupt();
+
+        thread1.join();
+    }
+
     public interface Task {
         public void performTask();
     }
@@ -168,11 +188,13 @@ public class TestLock {
                     System.out.println(Thread.currentThread().getName() +": Lock acquired.");
                     System.out.println("Work on progress...");
                     Thread.sleep(2000);
+
                 } finally {
                     System.out.println(Thread.currentThread().getName() +": Lock released.");
                     reentrantLock.unlock();
                 }
             } catch (InterruptedException e) {
+                System.err.println(Thread.currentThread().getName() + " - Interrupted wait");
                 e.printStackTrace();
             }
         }
