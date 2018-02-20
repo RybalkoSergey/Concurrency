@@ -49,12 +49,13 @@ public class TestLock {
 
     @Test
     public void test2() {
-        ExecutorService executor = Executors.newFixedThreadPool(2);
+        ExecutorService executor = Executors.newFixedThreadPool(3);
         ReentrantLock lock = new ReentrantLock();
 
         executor.submit(() -> {
             lock.lock();
             try {
+//                test15(lock);
                 System.out.println(Thread.currentThread().getName() + " Hold count : " + lock.getHoldCount());
                 sleep(3);
             } finally {
@@ -72,6 +73,15 @@ public class TestLock {
 
         ConcurrentUtils.stop(executor);
     }
+
+//    public void test15(ReentrantLock lock) {
+//        lock.lock();
+//        try {
+//            System.out.println(Thread.currentThread().getName() + " Hold count : " + lock.getHoldCount());
+//        } finally {
+//            lock.unlock();
+//        }
+//    }
 
     //----------------------------------------------------------------------------------------------------------------
     //----------------------------------------------------------------------------------------------------------------
