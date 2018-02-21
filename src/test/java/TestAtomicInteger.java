@@ -79,8 +79,6 @@ public class TestAtomicInteger {
 
         ConcurrentUtils.stop(executor);
 
-
-
         System.out.println(atomicInt.get());
     }
 }
