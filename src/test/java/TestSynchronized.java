@@ -5,6 +5,7 @@ import utils.ConcurrentUtils;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
 import static utils.ConcurrentUtils.sleep;
@@ -49,4 +50,86 @@ public class TestSynchronized {
             //}
         }
     }
+
+    @Test
+    public void test2() throws InterruptedException {
+        Q q = new Q();
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        executor.execute(new Producer(q));
+        executor.execute(new Consumer(q));
+
+        executor.shutdown();
+        executor.awaitTermination(10, TimeUnit.SECONDS);
+    }
+
+    private class Q {
+        int n;
+        boolean valueSet = false;
+
+        synchronized int get() {
+            while (!valueSet) {
+                try {
+                    wait();
+                } catch (InterruptedException e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+
+            System.out.println("get -" + n);
+            valueSet = false;
+            notify();
+            return n;
+        }
+
+        synchronized void put(int n) {
+            while (valueSet) {
+                try {
+                    wait();
+                } catch (InterruptedException e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+
+            sleep(1);
+            this.n = n;
+            valueSet = true;
+            System.out.println("put -" + n);
+            notify();
+        }
+    }
+
+    private class Producer implements Runnable {
+        Q q;
+
+        public Producer(Q q) {
+            this.q = q;
+        }
+
+
+        @Override
+        public void run() {
+            int i = 0;
+
+            while (true) {
+                q.put(i++);
+            }
+        }
+    }
+
+    private class Consumer implements Runnable {
+        Q q;
+
+        public Consumer(Q q) {
+            this.q = q;
+        }
+
+        @Override
+        public void run() {
+            while (true) {
+                q.get();
+            }
+        }
+    }
+
+
 }
