@@ -30,15 +30,15 @@ public class TestLock {
     }
 
     private class Counter {
-        ReentrantLock lock = new ReentrantLock();
+//        ReentrantLock lock = new ReentrantLock();
         private long count = 0;
 
         void increment() {
-            lock.lock();
+//            lock.lock();
             try {
                 count++;
             } finally {
-                lock.unlock();
+//                lock.unlock();
             }
         }
     }
@@ -49,7 +49,7 @@ public class TestLock {
 
     @Test
     public void test2() {
-        ExecutorService executor = Executors.newFixedThreadPool(3);
+        ExecutorService executor = Executors.newFixedThreadPool(2);
         ReentrantLock lock = new ReentrantLock();
 
         executor.submit(() -> {
@@ -98,52 +98,6 @@ public class TestLock {
         ConcurrentUtils.stop(service);
     }
 
-    @Test
-    public void test4() {
-        final int threadCount = 5;
-        final ExecutorService service = Executors.newFixedThreadPool(threadCount);
-        final Task task = new TryLockDemo();
-        for (int i=0; i< threadCount; i++) {
-            service.execute(new Worker(task));
-        }
-        ConcurrentUtils.stop(service);
-    }
-
-    @Test
-    public void test5() {
-        final int threadCount = 5;
-        final ExecutorService service = Executors.newFixedThreadPool(threadCount);
-        final Task task = new LockInterruptiblyDemo();
-        for (int i=0; i< threadCount; i++) {
-            service.execute(new Worker(task));
-        }
-        ConcurrentUtils.stop(service);
-    }
-
-    @Test
-    public void test6() throws InterruptedException {
-        final Task task = new LockInterruptiblyDemo();
-        Thread thread1 = new Thread(new Worker(task));
-        thread1.start();
-
-        Thread thread2 = new Thread(new Worker(task));
-        thread2.start();
-
-        Thread thread3 = new Thread(new Worker(task));
-        thread3.start();
-
-        sleep(1);
-
-        thread2.interrupt();
-        thread3.interrupt();
-
-        thread1.join();
-    }
-
-    public interface Task {
-        public void performTask();
-    }
-
     private class LockUnlockDemo implements Task {
         final ReentrantLock reentrantLock = new ReentrantLock();
         @Override
@@ -160,6 +114,21 @@ public class TestLock {
                 reentrantLock.unlock();
             }
         }
+    }
+
+    //----------------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void test4() {
+        final int threadCount = 5;
+        final ExecutorService service = Executors.newFixedThreadPool(threadCount);
+        final Task task = new TryLockDemo();
+        for (int i=0; i< threadCount; i++) {
+            service.execute(new Worker(task));
+        }
+        ConcurrentUtils.stop(service);
     }
 
     private class TryLockDemo implements Task {
@@ -186,6 +155,47 @@ public class TestLock {
         }
     }
 
+    //----------------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------------
+
+
+    @Test
+    public void test5() {
+        final int threadCount = 5;
+        final ExecutorService service = Executors.newFixedThreadPool(threadCount);
+        final Task task = new LockInterruptiblyDemo();
+        for (int i=0; i< threadCount; i++) {
+            service.execute(new Worker(task));
+        }
+        ConcurrentUtils.stop(service);
+    }
+
+    //----------------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------------
+
+
+    @Test
+    public void test6() throws InterruptedException {
+        final Task task = new LockInterruptiblyDemo();
+        Thread thread1 = new Thread(new Worker(task));
+        thread1.start();
+
+        Thread thread2 = new Thread(new Worker(task));
+        thread2.start();
+
+        Thread thread3 = new Thread(new Worker(task));
+        thread3.start();
+
+        sleep(1);
+
+        thread2.interrupt();
+        thread3.interrupt();
+
+        thread1.join();
+    }
+
     private class LockInterruptiblyDemo implements Task{
         final ReentrantLock reentrantLock = new ReentrantLock();
         @Override
@@ -209,6 +219,17 @@ public class TestLock {
             }
         }
     }
+
+    //----------------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------------------------
+
+
+    public interface Task {
+        public void performTask();
+    }
+
+
 
     public class Worker implements Runnable {
         private Task task;
@@ -246,7 +267,7 @@ public class TestLock {
             IntStream.range(0, 10000).forEach(i -> {
                 try {
                     System.out.println("Removing item " + i);
-                    sharedQueue.remove();
+                    sharedQueue.get();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -292,7 +313,7 @@ public class TestLock {
             lock.unlock();
         }
 
-        public Object remove() throws Exception {
+        public Object get() throws Exception {
             lock.lock();
             while(itemsCount <= 0) isEmpty.await();
 

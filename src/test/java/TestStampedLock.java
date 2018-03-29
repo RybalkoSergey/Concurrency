@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.locks.StampedLock;
+import java.util.stream.IntStream;
 
 import static utils.ConcurrentUtils.sleep;
 
@@ -22,20 +23,24 @@ public class TestStampedLock {
 
         executor.submit(() -> {
             long stamp = lock.writeLock();
+            System.out.println(Thread.currentThread().getName() +  " - writeLock.lock() --- stamp -> " + stamp);
             try {
                 sleep(1);
                 map.put("test", "test");
             } finally {
+                System.out.println(Thread.currentThread().getName() +  " - writeLock.unlockWrite() --- stamp -> " + stamp);
                 lock.unlockWrite(stamp);
             }
         });
 
         Runnable readTask = () -> {
             long stamp = lock.readLock();
+            System.out.println(Thread.currentThread().getName() +  " - readLock.lock() --- stamp -> " + stamp);
             try {
                 System.out.println(map.get("test"));
                 sleep(1);
             } finally {
+                System.out.println(Thread.currentThread().getName() +  " - unlockRead.lock() --- stamp -> " + stamp);
                 lock.unlockRead(stamp);
             }
         };
@@ -66,14 +71,26 @@ public class TestStampedLock {
             }
         });
 
+//        executor.execute(() ->
+//            IntStream.range(0, 3).forEach(i -> {
+//                long stamp = lock.tryOptimisticRead();
+//                System.out.println(Thread.currentThread().getName() +  " - tryOptimisticRead.lock() --- stamp -> " + stamp);
+//                try {
+//                    System.out.println("Optimistic Lock Valid: " + lock.validate(stamp));
+//                    sleep(1);
+//                } catch (Exception e) {
+//                    lock.unlock(stamp);
+//                }
+//        }));
+
         executor.submit(() -> {
             long stamp = lock.writeLock();
+            System.out.println(Thread.currentThread().getName() +  " - writeLock.lock() --- stamp -> " + stamp);
             try {
-                System.out.println("Write Lock acquired");
                 sleep(2);
             } finally {
+                System.out.println(Thread.currentThread().getName() +  " - writeLock.unlock() --- stamp -> " + stamp);
                 lock.unlock(stamp);
-                System.out.println("Write done");
             }
         });
 

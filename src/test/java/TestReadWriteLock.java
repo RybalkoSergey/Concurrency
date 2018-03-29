@@ -25,21 +25,22 @@ public class TestReadWriteLock {
 
         executor.submit(() -> {
             lock.writeLock().lock();
-            System.out.println("lock.writeLock()");
+            System.out.println(Thread.currentThread().getName() + " lock.writeLock()");
             try {
-                sleep(2);
+                sleep(3);
                 map.put("test", "test");
             } finally {
+                //System.out.println(Thread.currentThread().getName() + " lock released");
                 lock.writeLock().unlock();
             }
         });
 
         Runnable readTask = () -> {
-            System.out.println("try lock.readLock()");
+            System.out.println(Thread.currentThread().getName() + " try lock.readLock()");
             lock.readLock().lock();
             try {
-                System.out.println("lock.readLock()");
-                System.out.println(map.get("test"));
+                System.out.println(Thread.currentThread().getName() + " get lock.readLock()");
+                System.out.println(Thread.currentThread().getName() + " " + map.get("test"));
                 sleep(1);
             } finally {
                 lock.readLock().unlock();
@@ -130,15 +131,15 @@ public class TestReadWriteLock {
             });
         });
 
-//        executor.execute(() -> {
-//            IntStream.range(0, 41).forEach(i -> {
-//                try {
-//                    mapWithReadWriteLock.get(String.valueOf(0));
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            });
-//        });
+        executor.execute(() -> {
+            IntStream.range(0, 41).forEach(i -> {
+                try {
+                    mapWithReadWriteLock.get(String.valueOf(0));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+        });
 
         stop(executor);
 
@@ -169,20 +170,21 @@ public class TestReadWriteLock {
                 syncHashMap.put(key, value);
 //                sleep(1);
             } finally {
-//                writeLock.unlock();
 //                System.out.println(Thread.currentThread().getName() +  " - writeLock.unlock() --- putting done " + key);
+//                writeLock.unlock();
+
             }
         }
 
         public String get(String key){
             try {
 //                System.out.println(Thread.currentThread().getName() +  " - try readLock.lock() --- get " + key);
-                readLock.lock();
+//                readLock.lock();
 //                System.out.println(Thread.currentThread().getName() +  " - readLock.lock() --- get " + key);
                 return syncHashMap.get(key);
             } finally {
-                readLock.unlock();
 //                System.out.println(Thread.currentThread().getName() +  " - readLock.unlock() --- get " + key);
+//                readLock.unlock();
             }
         }
 
