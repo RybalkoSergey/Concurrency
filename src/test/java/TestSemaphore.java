@@ -21,24 +21,31 @@ public class TestSemaphore {
         Runnable longRunningTask = () -> {
             boolean permit = false;
             try {
-                permit = semaphore.tryAcquire(1, TimeUnit.SECONDS);
-                if (permit) {
-                    System.out.println("Semaphore acquired");
+                semaphore.acquire();
+                //permit = semaphore.tryAcquire(1, TimeUnit.SECONDS);
+                //if (permit) {
+                    System.out.println(Thread.currentThread().getName() + ": Semaphore acquired");
+                    System.out.println("Available permits: " + semaphore.availablePermits());
                     ConcurrentUtils.sleep(5);
-                } else {
-                    System.out.println("Could not acquire semaphore");
-                }
+
+                //} else {
+                //    System.out.println(Thread.currentThread().getName() + ": Could not acquire semaphore");
+                //}
             } catch (InterruptedException e) {
                 throw new IllegalStateException(e);
             } finally {
-                if (permit) {
+                //if (permit) {
+                    System.out.println(Thread.currentThread().getName() + ": Semaphore released");
                     semaphore.release();
-                }
+                //}
+
             }
         };
 
         IntStream.range(0, 10)
                 .forEach(i -> executor.submit(longRunningTask));
+
+
 
         ConcurrentUtils.stop(executor);
     }
@@ -80,7 +87,7 @@ public class TestSemaphore {
     private class Library {
         private static final int MAX_PERMIT = 3;
         private final Semaphore availableBook = new Semaphore(MAX_PERMIT, true);
-        private Book[] books = {new Book("Ramayan"), new Book("Mahabharat"), new Book("Panchtantra")};
+        private Book[] books = {new Book("Book #1"), new Book("Book #2"), new Book("Book #3")};
         private boolean[] beingRead = new boolean[MAX_PERMIT];
 
         //Book is being issued to reader

@@ -14,16 +14,19 @@ public class TestAtomicReference {
         Thread t1 = new Thread(() -> {
             for(int i=1 ; i<=3 ; i++){
                 p.set(new Person(p.get().age+10));
-                System.out.println("Atomic Check by first thread: "+Thread.currentThread().getName()+" is "+p.get().age);
+
+                System.out.println(Thread.currentThread().getName() + " Atomic Check by first thread: is "+p.get().age);
             }
         });
 
         Thread t2 = new Thread(() -> {
             Person per = p.get();
             for(int i=1 ; i<=3 ; i++){
-                System.out.println(p.get().equals(per)+"_"+per.age+"_"+p.get().age);
+                System.out.println(Thread.currentThread().getName() + " equals: " + p.get().equals(per) + " " + per.age + " " + p.get().age);
+
                 p.compareAndSet(per, new Person(p.get().age+10));
-                System.out.println("Atomic Check by second thread : "+Thread.currentThread().getName()+" is "+p.get().age);
+
+                System.out.println(Thread.currentThread().getName() + " Atomic Check by second thread : is "+p.get().age);
             }
         });
 

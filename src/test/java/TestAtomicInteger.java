@@ -68,9 +68,9 @@ public class TestAtomicInteger {
     public void test4() {
         AtomicInteger atomicInt = new AtomicInteger(0);
 
-        ExecutorService executor = Executors.newFixedThreadPool(2);
+        ExecutorService executor = Executors.newFixedThreadPool(5);
 
-        IntStream.range(0, 1000)
+        IntStream.range(0, 5)
                 .forEach(i -> {
                     Runnable task = () ->
                             atomicInt.accumulateAndGet(i, (n, m) -> n + m);

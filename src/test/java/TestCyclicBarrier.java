@@ -16,8 +16,8 @@ public class TestCyclicBarrier {
         Runnable barrier1Action = () -> System.out.println("BarrierAction 1 executed ");
         Runnable barrier2Action = () -> System.out.println("BarrierAction 2 executed ");
 
-        CyclicBarrier barrier1 = new CyclicBarrier(2, barrier1Action);
-        CyclicBarrier barrier2 = new CyclicBarrier(2, barrier2Action);
+        CyclicBarrier barrier1 = new CyclicBarrier(3, barrier1Action);
+        CyclicBarrier barrier2 = new CyclicBarrier(3, barrier2Action);
 
         ExecutorService executor = Executors.newFixedThreadPool(2);
         executor.execute(new CyclicBarrierRunnable(barrier1, barrier2));
@@ -38,11 +38,11 @@ public class TestCyclicBarrier {
 
         public void run() {
             try {
-                Thread.sleep(1000);
+                Thread.sleep(2000);
                 System.out.println(Thread.currentThread().getName() + " waiting at barrier 1");
                 this.barrier1.await();
 
-                Thread.sleep(1000);
+                Thread.sleep(2000);
                 System.out.println(Thread.currentThread().getName() + " waiting at barrier 2");
                 this.barrier2.await();
 

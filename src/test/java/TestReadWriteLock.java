@@ -30,7 +30,7 @@ public class TestReadWriteLock {
                 sleep(3);
                 map.put("test", "test");
             } finally {
-                //System.out.println(Thread.currentThread().getName() + " lock released");
+                System.out.println(Thread.currentThread().getName() + " lock released");
                 lock.writeLock().unlock();
             }
         });
@@ -41,7 +41,7 @@ public class TestReadWriteLock {
             try {
                 System.out.println(Thread.currentThread().getName() + " get lock.readLock()");
                 System.out.println(Thread.currentThread().getName() + " " + map.get("test"));
-                sleep(1);
+                sleep(3);
             } finally {
                 lock.readLock().unlock();
             }
